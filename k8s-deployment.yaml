@@ -1,0 +1,80 @@
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: config-pctigguli9
+  name: config-pctigguli9
+  namespace: 
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: config-pctigguli9
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pvc-config-pctigguli9
+  annotations:
+    volume.beta.kubernetes.io/storage-class: ''
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-pctigguli9
+  namespace: 
+spec:
+  selector:
+    matchLabels:
+      app: config-pctigguli9
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: config-pctigguli9
+      annotations:
+        prometheus.io/path: /actuator/prometheus
+        prometheus.io/port: '8080'
+        prometheus.io/scheme: http
+        prometheus.io/scrape: 'true'
+    spec:
+      containers:
+        - name: config-pctigguli9-container
+          image: //config-pctigguli9:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: pv-config-pctigguli9-log
+              mountPath: /logs
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: default
+            - name: SERVICE_PROTOCOL
+              value: http
+            - name: SERVICE_HOST
+              value: 
+            - name: SERVICE_PATH
+              value: 
+      volumes:
+        - name:  pv-config-pctigguli9-log
+          persistentVolumeClaim:
+            claimName: pvc-config-pctigguli9
+      imagePullSecrets:
+        - name: regcred
