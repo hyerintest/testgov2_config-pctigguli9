@@ -27,8 +27,8 @@ public class TagSorter implements OpenApiCustomiser {
     public void customise(OpenAPI openApi) {
         List<TagOrder> orders = Arrays.asList(
                 new TagOrder(SwaggerMarkdown.ACTUATOR, 0),
-                new TagOrder(SwaggerMarkdown.DESCRIPTION, 1),
-                new TagOrder(SwaggerMarkdown.LOGIN, 2)
+                new TagOrder(SwaggerMarkdown.LOGIN, 1),
+                new TagOrder(SwaggerMarkdown.DESCRIPTION, 2)
         );
         Map<String, Integer> orderMap = new HashMap<>();
         for (TagOrder order : orders) {
